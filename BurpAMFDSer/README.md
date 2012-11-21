@@ -1,5 +1,5 @@
 BurpAMFDSer
-=========
+============
 BurpAMFDSer is a Burp plugin that will deserialze/serialize AMF request and response to and from XML with the use of Xtream library (http://xstream.codehaus.org/)
 BurpAMFDSer also utilizes  part of Kenneth Hill's Jmeter source code for custom AMF deserialization (https://github.com/steeltomato/jmeter-amf)
 
