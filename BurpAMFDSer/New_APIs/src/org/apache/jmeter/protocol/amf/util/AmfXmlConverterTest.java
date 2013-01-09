@@ -15,8 +15,15 @@ package org.apache.jmeter.protocol.amf.util;
 * limitations under the License.
 */
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
+
+import sun.misc.IOUtils;
 
 
 import com.thoughtworks.xstream.XStream;
@@ -30,51 +37,23 @@ import flex.messaging.messages.RemotingMessage;
 
 public class AmfXmlConverterTest {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 //		runXmlAmfXmlTest();
 		
-		runXmlAmfXmlMessageTest();
+//		runXmlAmfXmlMessageTest();
 		
 //		testASObjectConverter();
+		test();
 	}
-	
-	public static void runXmlAmfXmlTest() {
-		XStream xs = AmfXmlConverter.getXStream();
-		
-		RemotingMessage msg = createTestObject();
-		
-		String xmlIn = xs.toXML(msg);
-		
-		System.out.println("Original XML: \n"+xmlIn);
-		
-		byte[] amfIn = AmfXmlConverter.convertXmlToAmf(xmlIn);
-		
-		String amfInStr = "";
-		for (byte i : amfIn) {
-			amfInStr += i + ", ";
-		}
-		System.out.println("Original AMF: \n"+amfInStr);
-		
-		String xmlOut = AmfXmlConverter.convertAmfToXml(amfIn);
-		
-		System.out.println("Result XML: \n" + xmlOut);
-		
-		byte[] amfOut = AmfXmlConverter.convertXmlToAmf(xmlIn);
-		
-		String amfOutStr = "";
-		for (byte i : amfOut) {
-			amfOutStr += i + ", ";
-		}
-		System.out.println("Result AMF: \n"+amfOutStr);
-		
-		System.out.println("Result AMF is " + (amfOut.length - amfIn.length) + " bytes longer");
-		
-		int bytesMismatch = 0;
-		for (int i=0; i < Math.min(amfOut.length, amfIn.length); i++) {
-			if (amfOut[i] != amfIn[i])
-				bytesMismatch++;
-		}
-		System.out.println("Result and original AMF have " + bytesMismatch + " bytes different");
+	public static void test() throws IOException{
+		RandomAccessFile f = new RandomAccessFile("request.ser", "r");
+		byte[] amf = new byte[(int)f.length()];
+		f.read(amf);
+		System.out.println("*** Request: \n " + AmfXmlConverter.convertAmfMessageToXml(amf, true));
+		f = new RandomAccessFile("response.ser", "r");
+		byte[]  resp = new byte[(int)f.length()];
+		f.read(resp);
+		System.out.println("*** Response: \n " + AmfXmlConverter.convertAmfMessageToXml(resp, true));
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -112,7 +91,7 @@ public class AmfXmlConverterTest {
 		}
 		System.out.println("Original AMF: \n"+amfInStr);
 		
-		String xmlOut = AmfXmlConverter.convertAmfMessageToXml(amfIn);
+		String xmlOut = AmfXmlConverter.convertAmfMessageToXml(amfIn, false);
 		
 		System.out.println("Result XML: \n" + xmlOut);
 		

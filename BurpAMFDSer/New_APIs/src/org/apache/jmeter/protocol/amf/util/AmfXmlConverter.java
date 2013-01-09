@@ -20,8 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -33,7 +32,6 @@ import flex.messaging.io.SerializationContext;
 import flex.messaging.io.amf.ASObject;
 import flex.messaging.io.amf.ActionContext;
 import flex.messaging.io.amf.ActionMessage;
-import flex.messaging.io.amf.Amf3Input;
 import flex.messaging.io.amf.Amf3Output;
 import flex.messaging.io.amf.AmfMessageDeserializer;
 import flex.messaging.io.amf.AmfMessageSerializer;
@@ -45,7 +43,6 @@ import flex.messaging.messages.AsyncMessage;
 import flex.messaging.messages.CommandMessage;
 import flex.messaging.messages.CommandMessageExt;
 import flex.messaging.messages.ErrorMessage;
-import flex.messaging.messages.Message;
 import flex.messaging.messages.RemotingMessage;
 
 public class AmfXmlConverter {
@@ -73,32 +70,6 @@ public class AmfXmlConverter {
 		return new byte[0];
 	}
 
-	/**
-	 * Converts AMF encoded object to XML String
-	 */
-	public static String convertAmfToXml(byte[] amf) {
-		XStream xs = getXStream();
-		SerializationContext serializationContext = new SerializationContext();
-		serializationContext.createASObjectForMissingType = true;
-		serializationContext.instantiateTypes = true;
-		Amf3Input amf3in = new Amf3Input(serializationContext);
-		ByteArrayInputStream bais = new ByteArrayInputStream(amf);
-		amf3in.setInputStream(bais);
-		try {
-			Object obj = amf3in.readObject();
-			String xml = xs.toXML(obj);
-			return xml;
-		} catch (Exception ex) {
-		} finally {
-			try {
-				amf3in.close();
-			} catch (IOException e) {
-
-			}
-		}
-
-		return "";
-	}
 
 	/**
 	 * Converts XML to a complete AMF message
@@ -130,29 +101,19 @@ public class AmfXmlConverter {
 		}
 	}
 
-	/**
-	 * Converts complete AMF message to XML representation
-	 */
-	public static String convertAmfMessageToXml(byte[] amf) {
-		return AmfXmlConverter.convertAmfMessageToXml(amf, false);
+	public static boolean checkAMFHeader(byte[] amf){
+		return false;
 	}
 
 	public static String convertAmfMessageToXml(byte[] amf, boolean useAliasRegistry) {
 		XStream xs = getXStream();
 		ActionContext actionContext = new ActionContext();
 		SerializationContext serializationContext = new SerializationContext();
-
 		// Class aliases for deserialization, mimics registerClassAlias in Flex
 		// Generally only used in rendering as it can cause serious problems for
 		// proxy sampling
-		if (useAliasRegistry) {
-			ClassAliasRegistry aliases = ClassAliasRegistry.getRegistry();
-			aliases.registerAlias("DSC", "flex.messaging.messages.CommandMessageExt"); // This
-			aliases.registerAlias("DSK", "flex.messaging.messages.AcknowledgeMessageExt");
-		}
 		serializationContext.createASObjectForMissingType = true;
-		serializationContext.enableSmallMessages = false;
-
+//		serializationContext.supportRemoteClass=true;
 		ByteArrayInputStream bin = new ByteArrayInputStream(amf);
 		ActionMessage message = new ActionMessage();
 
@@ -167,16 +128,17 @@ public class AmfXmlConverter {
 			return xml;
 
 		} catch (Exception ex) {
-//			ex.printStackTrace();
+			 ex.printStackTrace();
 			return null;
 		}
 	}
 
+	
+
 	private static boolean checkAckMessage(ActionMessage message) {
-		Object data = message.getBody(0).getData();
+	/*	Object data = message.getBody(0).getData();
 		Object cloneData = data;
 		int bodyCount = message.getBodyCount();
-		// System.out.println("*********** OBJDUMP: " + objDump(message));
 		if (bodyCount == 0)
 			return true;
 		else if (bodyCount == 1) {
@@ -189,7 +151,7 @@ public class AmfXmlConverter {
 				if (type.matches("DSC|DSK"))
 					return true;
 			}
-		}
+		}*/
 		return false;
 	}
 
@@ -207,18 +169,97 @@ public class AmfXmlConverter {
 			xstream.alias("ASObject", ASObject.class);
 			xstream.alias("AsyncMessage", AsyncMessage.class);
 			xstream.alias("DSC", CommandMessageExt.class);
-			xstream.alias("DSK", AcknowledgeMessageExt.class);
+//			xstream.alias("DSK", AcknowledgeMessageExt.class);
 
 			// Better ASObject Converter
 			Mapper mapper = xstream.getMapper();
-			xstream.registerConverter(new ASObjectConverter(mapper));
-		}
+		xstream.registerConverter(new ASObjectConverter(mapper));
+	}
 
 		return xstream;
 	}
-
-	public static String objDump(Object o) {
+    public static String objDump(Object o) {
+        StringBuffer buffer = new StringBuffer();
+        Class oClass = o.getClass();
+        if (oClass.isArray()) {
+            buffer.append("Array: ");
+            buffer.append("[");
+            for (int i = 0; i < Array.getLength(o); i++) {
+                Object value = Array.get(o, i);
+                if (value != null) {
+                    if (value.getClass().isPrimitive()
+                            || value.getClass() == java.lang.Long.class
+                            || value.getClass() == java.lang.String.class
+                            || value.getClass() == java.lang.Integer.class
+                            || value.getClass() == java.lang.Boolean.class
+                            || value.getClass() == java.lang.Short.class
+                            || value.getClass() == java.lang.Float.class
+                            || value.getClass() == java.lang.Character.class
+                            || value.getClass() == java.lang.Double.class
+                            || value.getClass() == java.lang.Byte.class) {
+                        buffer.append(value);
+                        if (i != (Array.getLength(o) - 1)) {
+                            buffer.append(",");
+                        }
+                    } else {
+                        buffer.append(objDump(value));
+                    }
+                }
+            }
+            buffer.append("]\n");
+        } else {
+            buffer.append("Class: " + oClass.getName());
+            buffer.append("{");
+            while (oClass != null) {
+                Field[] fields = oClass.getDeclaredFields();
+                for (int i = 0; i < fields.length; i++) {
+                    fields[i].setAccessible(true);
+                    buffer.append(fields[i].getName());
+                    buffer.append("=");
+                    try {
+                        Object value = fields[i].get(o);
+                        if (value != null) {
+                            if (value.getClass().isPrimitive()
+                                    || value.getClass() == java.lang.Long.class
+                                    || value.getClass() == java.lang.String.class
+                                    || value.getClass() == java.lang.Integer.class
+                                    || value.getClass() == java.lang.Boolean.class
+                                    || value.getClass() == java.lang.Short.class
+                                    || value.getClass() == java.lang.Float.class
+                                    || value.getClass() == java.lang.Character.class
+                                    || value.getClass() == java.lang.Double.class
+                                    || value.getClass() == java.lang.Byte.class) {
+                                buffer.append(value);
+                            } else {
+                                buffer.append(objDump(value));
+                            }
+                        }
+                    } catch (IllegalAccessException e) {
+                        buffer.append(e.getMessage());
+                    }
+                    if(i<fields.length-1) buffer.append(",");
+                }
+                oClass = oClass.getSuperclass();
+            }
+            buffer.append("}\n");
+        }
+        return buffer.toString();
+    }
+	public static String xmlDump(Object o) {
 		return xstream.toXML(o);
+	}
+	public static void unregisterAlisases(){
+		ClassAliasRegistry aliases= ClassAliasRegistry.getRegistry();
+//		aliases.unregisterAlias("DSC"); // This
+		aliases.unregisterAlias("DSK");
+//		aliases.unregisterAlias("DSA");
+	}
+	private static void registerAliases() {
+	
+		ClassAliasRegistry aliases = ClassAliasRegistry.getRegistry();
+//		aliases.registerAlias("DSC", CommandMessageExt.class.getName()); // This
+		aliases.registerAlias("DSK", AcknowledgeMessageExt.class.getName());
+//		aliases.registerAlias("DSA", "flex.messaging.messages.AsyncMessageExt");		
 	}
 
 }
