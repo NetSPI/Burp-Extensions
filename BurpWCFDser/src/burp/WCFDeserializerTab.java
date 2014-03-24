@@ -3,24 +3,13 @@ package burp;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.event.ComponentListener;
-import java.awt.event.InputMethodListener;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.Arrays;
 
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
-import javax.swing.text.JTextComponent;
-
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
-import com.sun.media.sound.UlawCodec;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 class WCFDeserializerTab implements IMessageEditorTab {
 	private boolean editable;
