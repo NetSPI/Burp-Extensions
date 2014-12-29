@@ -10,4 +10,5 @@ BurpWCFDSer is a Burp plugin that will deserialze/serialize WCF request and resp
 
 ###Contact
 https://github.com/khai-tran
+
 https://twitter.com/k_tr4n
