@@ -3,6 +3,10 @@ Content-Type Converter
 
 Burp extension to convert XML to JSON, JSON to XML, x-www-form-urlencoded to XML, and x-www-form-urlencoded to JSON.
 
+Right-click request and send to repeater.
+
+![alt tag](https://blog.netspi.com/wp-content/uploads/2015/04/SNAG-0165.jpg)
+
 ###Body Parameter###
 
 ```
