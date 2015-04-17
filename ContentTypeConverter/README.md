@@ -3,6 +3,8 @@ Content-Type Converter
 
 Burp extension to convert XML to JSON, JSON to XML, x-www-form-urlencoded to XML, and x-www-form-urlencoded to JSON.
 
+Requirements: Java 8 (Due to issues with one of the libraries it only works on Java 8. I have not had any problems with Burp using Java 8.)
+
 Right-click request and send to repeater.
 
 ![alt tag](https://blog.netspi.com/wp-content/uploads/2015/04/SNAG-0165.jpg)
