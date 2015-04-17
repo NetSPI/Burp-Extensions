@@ -41,7 +41,7 @@ public class Menu implements IContextMenuFactory {
                     IHttpService httpService = iReqResp.getHttpService();
                     try {
                         m_callbacks.sendToRepeater(httpService.getHost(), httpService.getPort(), (httpService.getProtocol().equals("https")), Utilities.convertToXML(m_helpers, iReqResp),null);
-                    } catch (UnsupportedEncodingException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
