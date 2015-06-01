@@ -16,25 +16,24 @@ public class Menu implements IContextMenuFactory {
         m_helpers = helpers;
     }
 
-    @Override
     public List<JMenuItem> createMenuItems(final IContextMenuInvocation invocation) {
         JMenuItem sendXMLToRepeater = new JMenuItem("Convert to XML and Send to Repeater");
         JMenuItem sendJSONToRepeater = new JMenuItem("Convert to JSON and Send to Repeater");
         sendXMLToRepeater.addMouseListener(new MouseListener() {
-            @Override
+
             public void mouseClicked(MouseEvent arg0) {
 
             }
 
-            @Override
+
             public void mouseEntered(MouseEvent arg0) {
             }
 
-            @Override
+
             public void mouseExited(MouseEvent arg0) {
             }
 
-            @Override
+
             public void mousePressed(MouseEvent arg0) {
                 IHttpRequestResponse[] selectedMessages = invocation.getSelectedMessages();
                 for (IHttpRequestResponse iReqResp : selectedMessages) {
@@ -47,26 +46,26 @@ public class Menu implements IContextMenuFactory {
                 }
             }
 
-            @Override
+
             public void mouseReleased(MouseEvent arg0) {
             }
         });
 
         sendJSONToRepeater.addMouseListener(new MouseListener() {
-            @Override
+
             public void mouseClicked(MouseEvent arg0) {
 
             }
 
-            @Override
+
             public void mouseEntered(MouseEvent arg0) {
             }
 
-            @Override
+
             public void mouseExited(MouseEvent arg0) {
             }
 
-            @Override
+
             public void mousePressed(MouseEvent arg0) {
                 IHttpRequestResponse[] selectedMessages = invocation.getSelectedMessages();
                 for (IHttpRequestResponse iReqResp : selectedMessages) {
@@ -76,7 +75,7 @@ public class Menu implements IContextMenuFactory {
                 }
             }
 
-            @Override
+
             public void mouseReleased(MouseEvent arg0) {
             }
         });
