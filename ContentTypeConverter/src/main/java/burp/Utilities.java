@@ -5,6 +5,8 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.w3c.dom.*;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -16,7 +18,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLDecoder;
 import java.util.*;
-import javax.xml.parsers.*;
 
 public class Utilities {
 
@@ -24,7 +25,7 @@ public class Utilities {
 
         byte[] request = requestResponse.getRequest();
 
-        if (helpers.analyzeRequest(request).getMethod() == "GET"){
+        if (Objects.equals(helpers.analyzeRequest(request).getMethod(), "GET")){
             request = helpers.toggleRequestMethod(request);
         }
 
@@ -34,7 +35,7 @@ public class Utilities {
 
         byte content_type = requestInfo.getContentType();
 
-        String body = new String(request, bodyOffset, request.length - bodyOffset);
+        String body = new String(request, bodyOffset, request.length - bodyOffset, "UTF-8");
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document doc = new Document() {
@@ -342,7 +343,7 @@ public class Utilities {
         }
 
         if (!success) {
-            return request;
+            return null;
         } else {
 
             List<String> headers;
@@ -357,7 +358,7 @@ public class Utilities {
 
             headers.add("Content-Type: application/xml;charset=UTF-8");
 
-            return helpers.buildHttpMessage(headers, prettyPrint(doc).getBytes());
+            return helpers.buildHttpMessage(headers,prettyPrint(doc).getBytes());
 
         }
 
@@ -367,7 +368,7 @@ public class Utilities {
 
         byte[] request = requestResponse.getRequest();
 
-        if (helpers.analyzeRequest(request).getMethod() == "GET"){
+        if (Objects.equals(helpers.analyzeRequest(request).getMethod(), "GET")){
             request = helpers.toggleRequestMethod(request);
         }
 
@@ -423,7 +424,7 @@ public class Utilities {
     }
 
     private static Map<String,String> splitQuery(String body) throws UnsupportedEncodingException {
-        Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+        Map<String, String> query_pairs = new LinkedHashMap<>();
         List<String> pairs = Arrays.asList(body.split("&"));
 
         for (String pair : pairs) {
@@ -446,7 +447,4 @@ public class Utilities {
         tf.transform(new DOMSource(xml), new StreamResult(out));
        return(out.toString());
     }
-
-
-
 }

@@ -3,22 +3,25 @@ package burp;
 import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Menu implements IContextMenuFactory {
-    private final IBurpExtenderCallbacks m_callbacks;
     private final IExtensionHelpers m_helpers;
 
-    public Menu(IBurpExtenderCallbacks callbacks, IExtensionHelpers helpers) {
-        m_callbacks = callbacks;
+    public Menu(IExtensionHelpers helpers) {
         m_helpers = helpers;
     }
 
     public List<JMenuItem> createMenuItems(final IContextMenuInvocation invocation) {
-        JMenuItem sendXMLToRepeater = new JMenuItem("Convert to XML and Send to Repeater");
-        JMenuItem sendJSONToRepeater = new JMenuItem("Convert to JSON and Send to Repeater");
+        List<JMenuItem> menus = new ArrayList();
+
+        if (invocation.getToolFlag() != IBurpExtenderCallbacks.TOOL_INTRUDER && invocation.getInvocationContext() != IContextMenuInvocation.CONTEXT_MESSAGE_EDITOR_REQUEST){
+            return menus;
+        }
+
+        JMenuItem sendXMLToRepeater = new JMenuItem("Convert to XML");
+        JMenuItem sendJSONToRepeater = new JMenuItem("Convert to JSON");
         sendXMLToRepeater.addMouseListener(new MouseListener() {
 
             public void mouseClicked(MouseEvent arg0) {
@@ -35,19 +38,21 @@ public class Menu implements IContextMenuFactory {
 
 
             public void mousePressed(MouseEvent arg0) {
-                IHttpRequestResponse[] selectedMessages = invocation.getSelectedMessages();
-                for (IHttpRequestResponse iReqResp : selectedMessages) {
-                    IHttpService httpService = iReqResp.getHttpService();
-                    try {
-                        m_callbacks.sendToRepeater(httpService.getHost(), httpService.getPort(), (httpService.getProtocol().equals("https")), Utilities.convertToXML(m_helpers, iReqResp),null);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+
             }
 
 
             public void mouseReleased(MouseEvent arg0) {
+                IHttpRequestResponse iReqResp = invocation.getSelectedMessages()[0];
+                try {
+                    byte[] request = Utilities.convertToXML(m_helpers, iReqResp);
+                    if (request != null) {
+
+                        iReqResp.setRequest(request);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -67,20 +72,25 @@ public class Menu implements IContextMenuFactory {
 
 
             public void mousePressed(MouseEvent arg0) {
-                IHttpRequestResponse[] selectedMessages = invocation.getSelectedMessages();
-                for (IHttpRequestResponse iReqResp : selectedMessages) {
-                    IHttpService httpService = iReqResp.getHttpService();
-                    m_callbacks.sendToRepeater(httpService.getHost(), httpService.getPort(), (httpService.getProtocol().equals("https")), Utilities.convertToJSON(m_helpers, iReqResp),null);
 
-                }
             }
 
 
             public void mouseReleased(MouseEvent arg0) {
+                IHttpRequestResponse iReqResp = invocation.getSelectedMessages()[0];
+                try {
+                    byte[] request = Utilities.convertToJSON(m_helpers, iReqResp);
+                    if (request != null) {
+
+                        iReqResp.setRequest(request);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
-        List<JMenuItem> menus = new ArrayList();
+
         menus.add(sendXMLToRepeater);
         menus.add(sendJSONToRepeater);
         return menus;
