@@ -5,9 +5,9 @@ Burp extension to convert XML to JSON, JSON to XML, x-www-form-urlencoded to XML
 
 Requirements: Java 8 (Due to issues with one of the libraries it only works on Java 8. I have not had any problems with Burp using Java 8.)
 
-Right-click request and send to repeater.
+Right-click on a request in an editable message window such as Repeater, Intruder, and the Proxy interceptor
 
-![alt tag](https://blog.netspi.com/wp-content/uploads/2015/04/SNAG-0165.jpg)
+![alt tag](https://blog.netspi.com/wp-content/uploads/2015/06/1433537211-4d9354b031b81daa10a7247d882d20da.jpg)
 
 ###Body Parameter###
 
