@@ -7,6 +7,15 @@ Requirements: Java 8 (Due to issues with one of the libraries it only works on J
 
 Right-click on a request in an editable message window such as Repeater, Intruder, and the Proxy interceptor
 
+The following convertions are supported:
+
+* XML to JSON
+* JSON to XML
+* Body Parameter to XML
+* Body Parameter to JSON
+* GET Request Parameter to POST Request XML
+* GET Request Parameter to POST Request JSON
+
 ![alt tag](https://blog.netspi.com/wp-content/uploads/2015/06/1433537211-4d9354b031b81daa10a7247d882d20da.jpg)
 
 ###Body Parameter###
