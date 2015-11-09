@@ -1,7 +1,9 @@
 package burp;
 
 import com.google.gson.Gson;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.json.XML;
 import org.w3c.dom.*;
 
@@ -326,7 +328,8 @@ public class Utilities {
         Boolean success = true;
 
         try {
-            JSONObject json = new JSONObject(body);
+            Object item = new JSONTokener(body).nextValue();
+            Object json = item;
 
             xml.append(XML.toString(json));
             xml.append("</root>");
