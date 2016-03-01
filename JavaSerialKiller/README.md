@@ -5,5 +5,5 @@ Burp extension to perform Java Deserialization Attacks using the ysoserial paylo
 
 Requirements: Java 8 
 
-Right-click on select Send to Java Serial Killer
+Right-click on a request and select Send to Java Serial Killer
 
