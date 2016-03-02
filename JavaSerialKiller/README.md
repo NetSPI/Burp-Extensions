@@ -14,3 +14,5 @@ Right-click on a request and select Send to Java Serial Killer
 Select the payload that you want, type in the command, and press Serialize
 
 ![alt tag](https://blog.netspi.com/wp-content/uploads/2016/03/img_56d5de37cf801.png)
+
+From here you can press Go button to send the request or right-click and send it to another tool.
