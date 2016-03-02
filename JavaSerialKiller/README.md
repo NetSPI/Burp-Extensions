@@ -3,6 +3,8 @@ Java Serial Killer
 
 Burp extension to perform Java Deserialization Attacks using the ysoserial payload generator tool.
 
+Blog https://blog.netspi.com/java-deserialization-attacks-burp/
+
 Chris Frohoff's ysoserial (https://github.com/frohoff/ysoserial)
 
 Requirements: Java 8 
