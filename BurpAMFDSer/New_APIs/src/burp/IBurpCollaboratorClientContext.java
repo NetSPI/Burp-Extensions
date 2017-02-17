@@ -16,7 +16,7 @@ import java.util.List;
  * which can be used to generate Burp Collaborator payloads and poll the
  * Collaborator server for any network interactions that result from using those
  * payloads. Extensions can obtain new instances of this class by calling
- *  <code>IBurpExtenderCallbacks.createBurpCollaboratorClientContext()</code>.
+ * <code>IBurpExtenderCallbacks.createBurpCollaboratorClientContext()</code>.
  * Note that each Burp Collaborator client context is tied to the Collaborator
  * server configuration that was in place at the time the context was created.
  */
@@ -52,6 +52,28 @@ public interface IBurpCollaboratorClientContext
      * the given payload.
      */
     List<IBurpCollaboratorInteraction> fetchCollaboratorInteractionsFor(String payload);
+
+    /**
+     * This method is used to retrieve all interactions made by Burp Infiltrator
+     * instrumentation resulting from payloads that were generated for this
+     * context.
+     *
+     * @return The interactions triggered by the Burp Infiltrator
+     * instrumentation that have occurred resulting from payloads that were
+     * generated for this context.
+     */
+    List<IBurpCollaboratorInteraction> fetchAllInfiltratorInteractions();
+
+    /**
+     * This method is used to retrieve interactions made by Burp Infiltrator
+     * instrumentation resulting from a single payload that was generated for
+     * this context.
+     *
+     * @param payload The payload for which interactions will be retrieved.
+     * @return The interactions triggered by the Burp Infiltrator
+     * instrumentation that have occurred resulting from the given payload.
+     */
+    List<IBurpCollaboratorInteraction> fetchInfiltratorInteractionsFor(String payload);
 
     /**
      * This method is used to retrieve the network location of the Collaborator
