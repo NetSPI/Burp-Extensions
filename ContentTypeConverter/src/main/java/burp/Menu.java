@@ -1,6 +1,8 @@
 package burp;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -8,9 +10,11 @@ import java.util.List;
 
 public class Menu implements IContextMenuFactory {
     private final IExtensionHelpers m_helpers;
+    private final IBurpExtenderCallbacks m_callbacks;
 
-    public Menu(IExtensionHelpers helpers) {
+    public Menu(IExtensionHelpers helpers,IBurpExtenderCallbacks callbacks) {
         m_helpers = helpers;
+        m_callbacks = callbacks;
     }
 
     public List<JMenuItem> createMenuItems(final IContextMenuInvocation invocation) {
@@ -22,73 +26,42 @@ public class Menu implements IContextMenuFactory {
 
         JMenuItem sendXMLToRepeater = new JMenuItem("Convert to XML");
         JMenuItem sendJSONToRepeater = new JMenuItem("Convert to JSON");
-        sendXMLToRepeater.addMouseListener(new MouseListener() {
-
-            public void mouseClicked(MouseEvent arg0) {
-
-            }
 
 
-            public void mouseEntered(MouseEvent arg0) {
-            }
-
-
-            public void mouseExited(MouseEvent arg0) {
-            }
-
-
-            public void mousePressed(MouseEvent arg0) {
-
-            }
-
-
-            public void mouseReleased(MouseEvent arg0) {
+        sendXMLToRepeater.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 IHttpRequestResponse iReqResp = invocation.getSelectedMessages()[0];
                 try {
-                    byte[] request = Utilities.convertToXML(m_helpers, iReqResp);
+                    byte[] request = Utilities.convertToXML(m_helpers, m_callbacks, iReqResp);
                     if (request != null) {
 
                         iReqResp.setRequest(request);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
+
         });
 
-        sendJSONToRepeater.addMouseListener(new MouseListener() {
-
-            public void mouseClicked(MouseEvent arg0) {
-
-            }
-
-
-            public void mouseEntered(MouseEvent arg0) {
-            }
-
-
-            public void mouseExited(MouseEvent arg0) {
-            }
-
-
-            public void mousePressed(MouseEvent arg0) {
-
-            }
-
-
-            public void mouseReleased(MouseEvent arg0) {
+        sendJSONToRepeater.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 IHttpRequestResponse iReqResp = invocation.getSelectedMessages()[0];
                 try {
-                    byte[] request = Utilities.convertToJSON(m_helpers, iReqResp);
+                    byte[] request = Utilities.convertToJSON(m_helpers, m_callbacks, iReqResp);
                     if (request != null) {
 
                         iReqResp.setRequest(request);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         });
+
+
 
 
         menus.add(sendXMLToRepeater);
