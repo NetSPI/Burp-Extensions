@@ -1,7 +1,6 @@
 package burp;
 
 import com.google.gson.Gson;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.json.XML;
@@ -14,16 +13,15 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.io.*;
 import java.net.URLDecoder;
 import java.util.*;
 
 public class Utilities {
+    public static byte[] convertToXML(IExtensionHelpers helpers,IBurpExtenderCallbacks callbacks, IHttpRequestResponse requestResponse) throws Exception {
 
-    public static byte[] convertToXML(IExtensionHelpers helpers, IHttpRequestResponse requestResponse) throws Exception {
+        PrintWriter stdout = new PrintWriter(callbacks.getStdout(),true);
+        PrintWriter stderr = new PrintWriter(callbacks.getStderr(),true);
 
         byte[] request = requestResponse.getRequest();
 
@@ -341,6 +339,7 @@ public class Utilities {
             doc = builder.parse(input);
 
         }catch (Exception e){
+            stderr.println(e);
             success = false;
 
         }
@@ -367,10 +366,11 @@ public class Utilities {
 
     }
 
-    public static byte[] convertToJSON(IExtensionHelpers helpers, IHttpRequestResponse requestResponse) {
+    public static byte[] convertToJSON(IExtensionHelpers helpers, IBurpExtenderCallbacks callbacks, IHttpRequestResponse requestResponse) {
 
         byte[] request = requestResponse.getRequest();
-
+        PrintWriter stdout = new PrintWriter(callbacks.getStdout(),true);
+        PrintWriter stderr = new PrintWriter(callbacks.getStderr(),true);
         if (Objects.equals(helpers.analyzeRequest(request).getMethod(), "GET")){
             request = helpers.toggleRequestMethod(request);
         }
@@ -399,6 +399,7 @@ public class Utilities {
                 json = body;
             }
         }catch (Exception e){
+            stderr.println(e);
             success = false;
 
         }
